@@ -9,7 +9,7 @@ class Data {
     Data() {
         this.avg = 0;
         this.cnt = 0;
-        this.maxx = -1e9;
+        this.maxx = Double.NEGATIVE_INFINITY;
     }
 
     public void adds(double val) {
@@ -54,7 +54,7 @@ class Analyzer {
                 double okok = Double.parseDouble(ok);
                 q.adds(okok);
             } catch (NumberFormatException e) {
-                System.out.println("Error!");
+                System.out.println("Invalid input, try again");
             }
         }
         scan.close();
