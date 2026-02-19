@@ -126,7 +126,7 @@ class KBTUOpenTeam {
 }
 
 public class task_2 {
-    static void main(String[] args) {
+    public static void main(String[] args) {
         KBTUOpenTeam team = new KBTUOpenTeam("Team 1");
         team.registerMember(new KBTUOpenContestant("Alice", "DOctavius"));
         team.registerMember(new KBTUOpenContestant("Bob", "MOctavius"));
