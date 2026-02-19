@@ -1,90 +1,65 @@
 package lab1.task5;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Vector;
 
 class Person {
     enum Gender {
-        MALE, FEMALE
+        BOY, GIRL
     }
 
-    private Gender gender;
-    private String id, email;
+    private final Gender gender;
+    private final String id;
 
-    public String toString() {
-        return String.format("Student<id:%s>", id);
-    }
-
-    Person(String id, Gender gender, String email) {
+    Person(String id, Gender gender) {
         this.id = id;
         this.gender = gender;
-        this.email = email;
     }
 
     public Gender getGender() {
         return gender;
     }
 
-    public void setGender(Gender gender) {
-        this.gender = gender;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
+    @Override
+    public String toString() {
+        return String.format("Person<id:%s, gender:%s>", id, gender);
     }
 }
 
-class DragonLunch {
-    Vector<Person> kidnapped = new Vector<>();
+class DragonLaunch {
+    private final Vector<Person> kidnapped = new Vector<>();
 
-    void kidnap(Person p) {
-        if (kidnapped.size() > 0 && kidnapped.lastElement().getGender() == Person.Gender.MALE
-                && p.getGender() == Person.Gender.FEMALE) {
-            kidnapped.remove(kidnapped.size() - 1);
+    public void kidnap(Person p) {
+        int n = kidnapped.size();
+        if (n > 0
+                && kidnapped.elementAt(n - 1).getGender() == Person.Gender.BOY
+                && p.getGender() == Person.Gender.GIRL) {
+
+            kidnapped.remove(n - 1);
         } else {
             kidnapped.add(p);
         }
     }
 
-    boolean willDragonEatOrNot() {
-        return kidnapped.size() > 0;
+    public boolean willDragonEatOrNot() {
+        return !kidnapped.isEmpty();
     }
 }
 
 public class task_5 {
     public static void main(String[] args) {
-        DragonLunch d = new DragonLunch();
+        DragonLaunch d = new DragonLaunch();
 
-        // ArrayList<Person> list = new ArrayList<>(Arrays.asList(
-        // new Person("24B01", Person.Gender.FEMALE, "kanicha@kbtu.kz"),
-        // new Person("24B02", Person.Gender.MALE, "kanich@kbtu.kz"),
-        // new Person("24B03", Person.Gender.FEMALE, "tanicha@kbtu.kz"),
-        // new Person("24B04", Person.Gender.MALE, "tanich@kbtu.kz")
-        // ));
-        ArrayList<Person> list = new ArrayList<>(Arrays.asList(
-                new Person("24B02", Person.Gender.MALE, "kanich@kbtu.kz"),
-                new Person("24B04", Person.Gender.MALE, "tanich@kbtu.kz"),
-                new Person("24B03", Person.Gender.FEMALE, "tanicha@kbtu.kz"),
-                new Person("24B01", Person.Gender.FEMALE, "kanicha@kbtu.kz")));
+        Person[] line = {
+                new Person("24B02", Person.Gender.BOY),
+                new Person("24B04", Person.Gender.BOY),
+                new Person("24B03", Person.Gender.GIRL),
+                new Person("24B01", Person.Gender.GIRL)
+        };
 
-        System.out.println(d.willDragonEatOrNot());
-        for (Person p : list) {
+        System.out.println("Start: " + d.willDragonEatOrNot());
+        for (Person p : line) {
             d.kidnap(p);
-            System.out.printf("Person to be kidnapped: %s%n", p);
-            System.out.println(d.willDragonEatOrNot());
+            System.out.println("Kidnap: " + p + " -> " + d.willDragonEatOrNot());
         }
     }
 }
