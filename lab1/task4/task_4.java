@@ -1,0 +1,249 @@
+package lab1.task4;
+
+import lab1.CourseStudent;
+
+import java.util.ArrayList;
+
+class Course {
+    private String name, description;
+    private ArrayList<Course> prerequisites;
+    private int credits;
+
+    Course(String name, String description, ArrayList<Course> prerequisites, int credits) {
+        this.name = name;
+        this.description = description;
+        this.prerequisites = prerequisites;
+        this.credits = credits;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public ArrayList<Course> getPrerequisites() {
+        return prerequisites;
+    }
+
+    public void setPrerequisites(ArrayList<Course> prerequisites) {
+        this.prerequisites = prerequisites;
+    }
+
+    public int getCredits() {
+        return credits;
+    }
+
+    public void setCredits(int credits) {
+        this.credits = credits;
+    }
+}
+
+class GradeBook {
+    private String instructorName;
+    private Course course;
+    private ArrayList<CourseStudent> students;
+    static final double MIN_GRADE = 0, MAX_GRADE = 100;
+
+    public GradeBook(String instructorName, Course course) {
+        this(instructorName, course, new ArrayList<>());
+    }
+
+    public GradeBook(String instructorName, Course course, ArrayList<CourseStudent> students) {
+        this.instructorName = instructorName;
+        this.course = course;
+        this.students = students;
+    }
+
+    public void displayMessage() {
+        System.out.printf("Welcome, %s! You are reviewing the course %s%n", instructorName, course);
+    }
+
+    public void displayGradeReport() {
+        outputBarChart(10);
+        System.out.println("Class average: " + this.determineClassAverage());
+
+        CourseStudent lowest = this.getLowestGradeStudent();
+        if (lowest == null) {
+            System.out.println("Lowest grade student: N/A (no valid grades in 0..100)");
+        } else {
+            System.out.printf("Lowest grade student is %s with grade %.2f%n",
+                    lowest.getName(), lowest.getGrade());
+        }
+
+        CourseStudent highest = this.getHighestGradeStudent();
+        if (highest == null) {
+            System.out.println("Highest grade student: N/A (no valid grades in 0..100)");
+        } else {
+            System.out.printf("Highest grade student is %s with grade %.2f%n",
+                    highest.getName(), highest.getGrade());
+        }
+    }
+
+    boolean isOutlier(CourseStudent s) {
+        return s.getGrade() < MIN_GRADE || s.getGrade() > MAX_GRADE;
+    }
+
+    /**
+     * set maxBarsCharWidth to <= 0 if you want to see every bar for every student
+     */
+    void outputBarChart(int maxBarsCharWidth) {
+        System.out.println("Grades distribution:");
+
+        final int bins = 10;
+        int[] counters = new int[bins];
+        final double valueRange = MAX_GRADE - MIN_GRADE;
+        int notCoveredCount = 0;
+
+        for (CourseStudent student : students) {
+            if (isOutlier(student)) {
+                notCoveredCount++;
+                continue;
+            }
+            double grade = student.getGrade();
+            double adjustedGrade = grade - MIN_GRADE;
+            int bin = (int) Math.floor(bins * (adjustedGrade / valueRange));
+            if (bin >= bins)
+                bin = bins - 1;
+            if (bin < 0)
+                bin = 0;
+            counters[bin]++;
+        }
+
+        if (notCoveredCount > 0) {
+            boolean singleCovered = notCoveredCount == 1;
+            System.out.println("NOTE");
+            System.out.printf(
+                    "%d student%s %s not covered in the range from %.3f to %.3f%n",
+                    notCoveredCount,
+                    singleCovered ? "" : "s",
+                    singleCovered ? "was" : "were",
+                    MIN_GRADE, MAX_GRADE);
+        }
+        for (int i = 0; i < bins; i++) {
+            double intervalStart = i * valueRange / bins + MIN_GRADE;
+            double intervalEnd = (i + 1) * valueRange / bins + MIN_GRADE;
+            String bar;
+            if (maxBarsCharWidth <= 0) {
+                bar = "#".repeat(counters[i]);
+            } else {
+                bar = "#".repeat((int) Math.ceil(maxBarsCharWidth * counters[i] / MAX_GRADE));
+            }
+            System.out.printf("%2.0f - %3.0f: %s%n", intervalStart, intervalEnd, bar);
+        }
+    }
+
+    public void addStudent(CourseStudent student) {
+        students.add(student);
+    }
+
+    double determineClassAverage() {
+        double gradeSum = 0;
+        int notCoveredCount = 0;
+        for (CourseStudent student : students) {
+            if (isOutlier(student)) {
+                notCoveredCount++;
+                continue;
+            }
+            gradeSum += student.getGrade();
+        }
+        if (students.size() - notCoveredCount == 0)
+            return 0;
+        return gradeSum / (students.size() - notCoveredCount);
+    }
+
+    public CourseStudent getLowestGradeStudent() {
+        double minGrade = 100;
+        CourseStudent lowestGradeStudent = null;
+        for (CourseStudent student : students) {
+            if (isOutlier(student))
+                continue;
+            if (student.getGrade() < minGrade) {
+                minGrade = student.getGrade();
+                lowestGradeStudent = student;
+            }
+        }
+        return lowestGradeStudent;
+    }
+
+    public CourseStudent getHighestGradeStudent() {
+        double maxGrade = 0;
+        CourseStudent highestGradeStudent = null;
+        for (CourseStudent student : students) {
+            if (isOutlier(student))
+                continue;
+            if (student.getGrade() > maxGrade) {
+                maxGrade = student.getGrade();
+                highestGradeStudent = student;
+            }
+        }
+        return highestGradeStudent;
+    }
+
+    public String getInstructorName() {
+        return instructorName;
+    }
+
+    public void setInstructorName(String instructorName) {
+        this.instructorName = instructorName;
+    }
+
+    public Course getCourse() {
+        return course;
+    }
+
+    public void setCourse(Course course) {
+        this.course = course;
+    }
+
+    public ArrayList<CourseStudent> getStudents() {
+        return students;
+    }
+
+    public void setStudents(ArrayList<CourseStudent> students) {
+        this.students = students;
+    }
+}
+
+public class task_4 {
+    public static void main(String[] args) {
+        Course course = new Course("CS101", "Object-Oriented Programming and Design", new ArrayList<>(), 3);
+        GradeBook gradeBook = new GradeBook("Izbassar Asylzhan", course);
+        gradeBook.displayMessage();
+
+        gradeBook.addStudent(new CourseStudent("Bob", "123456789", 100));
+
+        // Random rnd = new Random();
+        // for (int i = 0; i < 1000; i++) {
+        // double grade;
+        // if (Math.random() < 1. / 50) {
+        // grade = Math.random() * 20;
+        // } else if (Math.random() < 1. / 100) {
+        // grade = 30 + Math.random() * 20 - 10;
+        // } else {
+        // grade = (rnd.nextGaussian() * 10) + 78;
+        // }
+        // gradeBook.addStudent(new CourseStudent("Student" + i, Integer.toString(i),
+        // grade));
+        // }
+
+        // System.out.println("Please, input students' grades:");
+        // ArrayList<CourseStudent> students = CourseStudent.inputStudents(10);
+        //
+        // for (CourseStudent student : students) {
+        // gradeBook.addStudent(student);
+        // }
+
+        gradeBook.displayGradeReport();
+    }
+}
