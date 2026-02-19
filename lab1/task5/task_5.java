@@ -19,7 +19,6 @@ class Person {
         return gender;
     }
 
-    @Override
     public String toString() {
         return String.format("Person<id:%s, gender:%s>", id, gender);
     }
